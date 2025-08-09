@@ -98,11 +98,37 @@ def runcleandata():
     # 2. Drop completely empty rows
     df.dropna(how='all', inplace=True)
 
+   
     # 3. Handle City column
-    if 'city_location' not in df.columns:
-        df['city_location'] = "Unknown"
-    else:
+    
+    if 'city_location' in df.columns:
+    # Fill NaN with 'Unknown'
         df['city_location'] = df['city_location'].fillna("Unknown")
+    
+    # Clean formatting
+        df['city_location'] = (
+        df['city_location']
+        .astype(str)
+        .str.strip()
+        .str.title()
+        )
+    
+    # Standardize common variations
+        city_map = {
+        'Bangalore': 'Bengaluru',
+        'Delhi': 'Delhi NCR',
+        'New Delhi': 'Delhi NCR',
+        'Ncr': 'Delhi NCR',
+        'Gurgaon': 'Delhi NCR',
+        'Noida': 'Delhi NCR',
+        'Bombay': 'Mumbai'
+        }
+        df['city_location'] = df['city_location'].replace(city_map)
+    else:
+        df['city_location'] = "Unknown"
+
+
+
 
     # 4. Handle Date column
     if 'date' in df.columns:
@@ -169,17 +195,6 @@ def visualizeinsights():
             plt.show(block=False)
             plt.pause(0.1)
 
-        # Top cities
-        if 'city_location' in df.columns:
-            plt.figure(figsize=(8, 5))
-            top_cities = df['city_location'].value_counts().head(5)
-            sns.barplot(x=top_cities.values, y=top_cities.index)
-            plt.title("Top 5 Cities by Startup Count")
-            plt.xlabel("Number of Startups")
-            plt.ylabel("City")
-            plt.tight_layout()
-            plt.show(block=False)
-            plt.pause(0.1)
 
         # Top startups
         if 'startup_name' in df.columns:
@@ -243,11 +258,6 @@ def Dataanalyse():
             text.insert(tk.END, "\nTop 5 Sectors:\n")
             text.insert(tk.END, f"{top_sectors}\n")
 
-        # Top cities
-        if 'city_location' in df.columns:
-            top_cities = df['city_location'].value_counts().head(5)
-            text.insert(tk.END, "\nTop 5 Cities:\n")
-            text.insert(tk.END, f"{top_cities}\n")
 
         # Top startups
         if 'startup_name' in df.columns:
@@ -298,27 +308,27 @@ Recommendations:
 font1 = ('times', 13, 'bold')
 
 uploadButton = Button(main, text="Upload Kaggle Dataset", command=uploadDataset)
-uploadButton.place(x=50, y=100)
+uploadButton.place(x=50, y=150)
 uploadButton.config(font=font1)
 
 cleanStepsButton = Button(main, text="Show Cleaning Steps", command=showCleaningSteps)
-cleanStepsButton.place(x=50, y=200)
+cleanStepsButton.place(x=50, y=250)
 cleanStepsButton.config(font=font1)
 
 cleanDataButton = Button(main, text="Clean Data", command=runcleandata)
-cleanDataButton.place(x=50, y=300)
+cleanDataButton.place(x=50, y=350)
 cleanDataButton.config(font=font1)
 
 analyseButton = Button(main, text="Analyze Data", command=Dataanalyse)
-analyseButton.place(x=50, y=400)
+analyseButton.place(x=50, y=450)
 analyseButton.config(font=font1)
 
 visualizeButton = Button(main, text="Visualize Insights", command=visualizeinsights)
-visualizeButton.place(x=50, y=500)
+visualizeButton.place(x=50, y=550)
 visualizeButton.config(font=font1)
 
 recommendButton = Button(main, text="Recommendations", command=showinsights)
-recommendButton.place(x=50, y=600)
+recommendButton.place(x=50, y=650)
 recommendButton.config(font=font1)
 
 main.config(bg='LightSkyBlue')
